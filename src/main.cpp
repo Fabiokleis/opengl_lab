@@ -5,6 +5,24 @@
 #include <sstream>
 #include <iostream>
 
+#define ASSERT(x) if ((!x)) break;
+#define GLCALL(x) GLClearError();\
+    x;\
+    ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+
+static void GLClearError() {
+    while (glGetError() != GL_NO_ERROR);
+}
+
+static bool GLLogCall(const char* function, const char* file, int line) {
+    while (GLenum error = glGetError()) {
+        std::cout << "[OpenGL Error] (" << error << "): " 
+            << function << " " << file << ":" << line << std::endl;
+        return false;
+    }
+    return true;
+}
+
 struct ShaderProgramSource {
     std::string VertexSource;
     std::string FragmentSource;
@@ -95,6 +113,8 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
+    glfwSwapInterval(1);
+
     unsigned int err = glewInit();
     if (GLEW_OK != err) {
         std::cout << "Error!" << std::endl;
@@ -134,14 +154,25 @@ int main(void)
     unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
     glUseProgram(shader);
 
+    int location = glGetUniformLocation(shader, "u_Color");
+    if (location == -1)
+        std::cout << "Cannot get uniform location" << std::endl;
+        
+    glUniform4f(location, 0.0f, 0.0f, 1.0f, 1.0f);
+
+    float r = 0.0f;
+    float increment = 0.05f;
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
-
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
+        GLCALL(glUniform4f(location, r, 0.2f, 0.7f, 1.0f));
+        GLCALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+        
+        increment = r > 1.0f ? -0.05f : (r < 0.0f ? 0.05f : increment);
+        r += increment;
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 
