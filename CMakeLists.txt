@@ -8,17 +8,19 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(glew-cmake_BUILD_SHARED OFF CACHE BOOL "" FORCE)
 set(ONLY_LIBS ON CACHE BOOL "" FORCE)
 
-include_directories(${OPENGL_INCLUDE_DIRS})
+file(GLOB SOURCE ./src/main.cpp ./src/*.cpp)
 
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_executable(${PROJECT_NAME} ${SOURCE})
+
+include_directories(${OPENGL_INCLUDE_DIRS})
 
 add_subdirectory(dependencies/glfw)
 add_subdirectory(dependencies/glew)
 
 find_package(OpenGL REQUIRED)
 
-
 target_include_directories(${PROJECT_NAME} 
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
     PUBLIC dependencies/glfw/include
     PUBLIC dependencies/uglew/include
 )
