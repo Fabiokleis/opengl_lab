@@ -16,6 +16,8 @@ include_directories(${OPENGL_INCLUDE_DIRS})
 
 add_subdirectory(dependencies/glfw)
 add_subdirectory(dependencies/glew)
+add_subdirectory(dependencies/stbi)
+add_subdirectory(dependencies/glm)
 
 find_package(OpenGL REQUIRED)
 
@@ -23,8 +25,10 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
     PUBLIC dependencies/glfw/include
     PUBLIC dependencies/uglew/include
+    PUBLIC dependencies/stbi/include
+    PUBLIC dependencies/glm/glm
 )
 
 target_link_directories(${PROJECT_NAME} PUBLIC dependencies/glfw/src dependencies/glew/src)
-target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} glfw libglew_static) 
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} glfw libglew_static glm::glm) 
 

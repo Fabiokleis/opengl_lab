@@ -1,6 +1,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include "renderer.hpp"
 #include "vertexbuffer.hpp"
 #include "indexbuffer.hpp"
@@ -8,6 +9,13 @@
 #include "shader.hpp"
 #include "texture.hpp"
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+}
 
 int main(void)
 {
@@ -21,6 +29,11 @@ int main(void)
     glfwInitHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwInitHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    //GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    //const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+    glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
 
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
@@ -45,7 +58,7 @@ int main(void)
     std::cout << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
     float positions[] = {
-        -0.5f, -0.5f, 0.0f, 0.0f, // 0
+        -0.5f, -0.5f, 0.0f, 0.0f, // 0 (pos.x, pox.y, tex.x, tex.y)
         0.5f, -0.5f,  1.0f, 0.0f, // 1
         0.5f, 0.5f, 1.0f, 1.0f,   // 2
         -0.5f, 0.5f, 0.0f, 1.0f,  // 3
@@ -70,10 +83,14 @@ int main(void)
 
     IndexBuffer ib(indices, 6);
 
+
+    glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+
     Shader shader("res/shaders/basic.shader");
     shader.Bind();
 
-    shader.SetUniform4f("u_Color", 0.0f, 0.0f, 1.0f, 1.0f);
+    shader.SetUniform4f("u_Color", 0.0f, 0.0f, 1.0f, 0.5f);
+    shader.SetUniformMat4f("u_MVP", proj);
 
     Texture texture("res/textures/Octocat.png");
     texture.Bind();
@@ -89,13 +106,15 @@ int main(void)
     float r = 0.0f;
     float increment = 0.05f;
 
+    glfwSetKeyCallback(window, key_callback);
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
         renderer.Clear();
         shader.Bind();
-        shader.SetUniform4f("u_Color", r, 0.2f, 0.7f, 1.0f);
+        shader.SetUniform4f("u_Color", r, 0.2f, 0.7f, 0.125f);
 
         renderer.Draw(va, ib, shader);
 
