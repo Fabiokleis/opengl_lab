@@ -36,7 +36,7 @@ int main(void)
     glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(960, 540, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -58,10 +58,10 @@ int main(void)
     std::cout << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
     float positions[] = {
-        -0.5f, -0.5f, 0.0f, 0.0f, // 0 (pos.x, pox.y, tex.x, tex.y)
-        0.5f, -0.5f,  1.0f, 0.0f, // 1
-        0.5f, 0.5f, 1.0f, 1.0f,   // 2
-        -0.5f, 0.5f, 0.0f, 1.0f,  // 3
+        100.f, 100.f, 0.0f, 0.0f, // 0 (pos.x, pox.y, tex.x, tex.y)
+        200.f, 100.f,  1.0f, 0.0f, // 1
+        200.f, 200.f, 1.0f, 1.0f,   // 2
+        100.f, 200.f, 0.0f, 1.0f,  // 3
     };
    
     unsigned int indices[] = {
@@ -84,15 +84,19 @@ int main(void)
     IndexBuffer ib(indices, 6);
 
 
-    glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+    glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.f, 540.0f, -1.0f, 1.0f);
+    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100, 0, 0));
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(200, 200, 0));
+
+    glm::mat4 mvp = proj * view * model;
 
     Shader shader("res/shaders/basic.shader");
     shader.Bind();
 
     shader.SetUniform4f("u_Color", 0.0f, 0.0f, 1.0f, 0.5f);
-    shader.SetUniformMat4f("u_MVP", proj);
+    shader.SetUniformMat4f("u_MVP", mvp);
 
-    Texture texture("res/textures/Octocat.png");
+    Texture texture("res/textures/grid_0-1.png");
     texture.Bind();
     shader.SetUniform1i("u_Texture", 0); // match texture slot
 
