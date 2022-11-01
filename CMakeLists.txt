@@ -19,6 +19,26 @@ add_subdirectory(dependencies/glew)
 add_subdirectory(dependencies/stbi)
 add_subdirectory(dependencies/glm)
 
+set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/imgui)
+add_library(IMGUI STATIC)
+target_sources(IMGUI
+    PRIVATE
+        ${IMGUI_DIR}/imgui_demo.cpp
+        ${IMGUI_DIR}/imgui_draw.cpp
+        ${IMGUI_DIR}/imgui_tables.cpp
+        ${IMGUI_DIR}/imgui_widgets.cpp
+        ${IMGUI_DIR}/imgui.cpp
+
+    PRIVATE
+        ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+)
+
+target_include_directories(IMGUI
+    PRIVATE ${IMGUI_DIR}
+    PRIVATE ${IMGUI_DIR}/backends
+)
+
 find_package(OpenGL REQUIRED)
 
 target_include_directories(${PROJECT_NAME} 
@@ -27,8 +47,10 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC dependencies/uglew/include
     PUBLIC dependencies/stbi/include
     PUBLIC dependencies/glm/glm
+    PUBLIC dependencies/imgui
+    PUBLIC dependencies/imgui/backends
 )
 
 target_link_directories(${PROJECT_NAME} PUBLIC dependencies/glfw/src dependencies/glew/src)
-target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} glfw libglew_static glm::glm) 
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} glfw libglew_static glm::glm IMGUI) 
 
